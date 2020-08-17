@@ -20,6 +20,8 @@ proxyはNoneで処理できない。
 APIに必要なもの
 proxyFlag,ProxyID,ProxyPASS,ProxyIP,ProxyPort
 
+py -m pip install <library> -t <path>
+
 
 【進捗】
 2020/08/07

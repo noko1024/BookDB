@@ -1,8 +1,20 @@
+#モジュールのimport準備
+import os
+import sys
+
+#Main.pyまでのフルパスを取得し__file__でsplit
+basepath = os.path.split(os.path.realpath(__file__))[0]
+#ライブラリを保存したディレクトリを指定し有効化
+sys.path.insert(0, os.path.join(basepath, 'libpack'))
+
 
 #システム全般に関わるライブラリ
-import os
 import threading
 import pathlib
+import json
+import sqlite3
+import cryptography
+#import pycrypto
 #エラー音とか？
 #import pygame
 #外部通信に関わるライブラリ
@@ -16,6 +28,7 @@ from kivy.core.window import Window
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
+from kivy.uix.button import Button
 
 #kivyLangを引数化して制御したい。
 
@@ -38,14 +51,19 @@ class MainApp(App):
 #返したいものAPIConnのインスタンス
 
 #https://pyky.github.io/kivy-doc-ja/guide/basic.html
-
+#https://qiita.com/penta2019/items/a500630608960752a914
 class ProxyRequestApp(App):
-    def __init__(self):
-        pass
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
+    
 
     def build(self):
-        return
+        return Button(text="Hello, World!")
 
+
+class AuthRequestApp(App):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
     
 
 #汎用的にしたい
@@ -61,18 +79,43 @@ class StandbyApp(App):
 class ErrorApp(App):
     pass
 
-#設定ファイル(),DB(.db)に決め打ち
+#設定ファイル(config.json),DB(books.db)に決め打ち
 class FileIO:
     def __init__(self):
-        self.currentPath = os.getcwd()
+        self.basePath = basepath
+        self.configPath = os.path.join(basepath,"config.json")
+        self.dbPath = os.path.join(basepath,"books.db")
     
-    def existsChk(self,filePath):
-        #filePathが絶対パスであるかどうか
-        if not filePath.is_absolute():
-            #でないなら相対パスを絶対パスに変換
-            filePath = filePath.resolve()
-        os.path.exists()
-    def DBinit(self):
+
+    def existsChk(self):
+        return os.path.exists(self.configPath),os.path.exists(self.dbPath)
+
+    def configInit(self):
+        pass
+
+    def configRead(self,keys=None):
+    #keyはList
+        try:
+            #keysがNoneなら
+            if keys is None:
+                pass
+            else:
+                for key in keys:
+                    pass
+        
+        #ファイルが存在しない時
+        except FileNotFoundError:
+            pass
+        #ファイルにアクセスできない時
+        except:
+            pass
+
+        return
+    
+    def configWrite(self,key,value):
+        pass
+
+    def dbInit(self):
         pass        
 
 
@@ -112,9 +155,17 @@ class APICall:
 #起動時にパスワード求めてフレーズを基にAESを復号→文字列切り出し＆演算で成功したか確認
 def init():
     #プロキシの要求→(接続の確認)→ファイルの存在確認→設定ファイルの読み込み(or生成)→retunでAPIのインスタンスを返す
+    IO = FileIO()
+    config,db = IO.existsChk()
+    if config is False:
+        initProxy = ProxyRequestApp().run()
+        print(type(initProxy))
+        print(initProxy)
+    else:
+        auth = IO.configRead(["Proxy"])
+        AuthRequestApp().run()
+        
     
-    initProxy = ProxyRequestApp().run()
-
     return
 
 
