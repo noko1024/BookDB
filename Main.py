@@ -5,14 +5,14 @@ import sys
 #Main.pyまでのフルパスを取得し__file__でsplit
 basepath = os.path.split(os.path.realpath(__file__))[0]
 #ライブラリを保存したディレクトリを指定し有効化
-sys.path.insert(0, os.path.join(basepath, 'libpack'))
-
+sys.path.insert(0, os.path.join(basepath, 'backlib')
 
 #システム全般に関わるライブラリ
 import threading
 import pathlib
 import json
 import sqlite3
+#https://ymgsapo.com/2019/08/05/cryptography-python/#i
 import cryptography
 #import pycrypto
 #エラー音とか？
@@ -29,6 +29,11 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
+from kivy.core.window import Window
+from kivy.uix.widget import Widget
+
+proxyInstance = "incetanceData"
+
 
 #kivyLangを引数化して制御したい。
 
@@ -52,15 +57,34 @@ class MainApp(App):
 
 #https://pyky.github.io/kivy-doc-ja/guide/basic.html
 #https://qiita.com/penta2019/items/a500630608960752a914
-class ProxyRequestApp(App):
+
+#
+class ProxyRequestApp(App,Widget):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
+        self.instance = None
     
-
     def build(self):
-        return Button(text="Hello, World!")
+        Window.size = (400, 200)
+        return 
 
+    def activateButtonClicked(self):
+        global proxyInstance
+        print(type(self.ids.text1.text))
+        proxyInstance = APICall(False)
+        proxyChk_Thread = threading.Thread(target=proxyInstance.connectionChk())
+        userStandby_Thread = threading.Thread(target=StandbyApp().run())
+        proxyChk_Thread.start()
+        userStandby_Thread.start()
+        proxyChk_Thread.join()
+        userStandby_Thread.join()
+    
+    def run(self,**kwargs):
+        super().run(**kwargs)
 
+        return "PIP",self.instance
+
+#起動時パスワード認証
 class AuthRequestApp(App):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -70,11 +94,12 @@ class AuthRequestApp(App):
 class StandbyApp(App):
 #resonとか表示させる?いつ止める？
 # →スレッドで回してjoinさせる？
-    def __init__(self):
-        pass
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
 
     def build(self):
         return
+
 
 class ErrorApp(App):
     pass
@@ -136,9 +161,11 @@ class APICall:
             "http":"http://%s:%s@%s:%s" % (self.ID,self.PASS,self.IP,self.PORT)
             }
     def connectionChk(self):
-    
+        response = requests.get("https://ctf.noko1024.net/")
+        print(response.text)
+        print(response.status_code)
     #通信成功の可否とHTMLステータスコード,コンテンツを返す。
-        return 
+        return response.status_code,response.text
 
 
     
@@ -158,9 +185,10 @@ def init():
     IO = FileIO()
     config,db = IO.existsChk()
     if config is False:
-        initProxy = ProxyRequestApp().run()
-        print(type(initProxy))
-        print(initProxy)
+        print("import TH")
+        ProxyRequestApp().run()
+
+        print("return="+str(initProxy.instance))
     else:
         auth = IO.configRead(["Proxy"])
         AuthRequestApp().run()
