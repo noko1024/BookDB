@@ -97,7 +97,8 @@ class ProxyRequestApp(proxyUI.Ui_Dialog):
 
         if self.proxyUse is True:
             proxyInstance = APICall(True)
-        proxyInstance = APICall(False)
+        else:
+            proxyInstance = APICall(False,self.InputID.text(),self.InputPassword.text(),self.InputIP.text(),self.InputPort.text())
         Standby = StandbyApp()
         Thread = threading.Thread(target=proxyInstance.connectionChk)
         Thread.start()
